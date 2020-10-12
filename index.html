@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Toxicity classifier</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/toxicity"></script>
+
+
+	<script type="text/javascript">
+
+
+		function clearNodes(){     //function to clear previous
+
+			var myNode=document.getElementById("res");
+			while (myNode.firstChild) {
+    			myNode.removeChild(myNode.lastChild);
+			}
+		}
+
+
+
+		function predict(){
+		var text=document.getElementById("txt").value; //get the input data
+		clearNodes();    //clear all previous results
+		const threshold=0.9; //setting threshold for model
+		toxicity.load(threshold).then(model=>{
+			const sentences=[text];
+			model.classify(sentences).then(predictions=>{
+				var flag=false;
+				for(i=0;i<7;i++){
+					if(predictions[i].results[0].match){
+						flag=true;  //flag on if any toxicity found
+						var node=document.createElement("LI");
+						var data=document.createTextNode(predictions[i].label.toUpperCase()+" is found with probability of "+
+							predictions[i].results[0].probabilities[1].toFixed(4)*100+"%");
+						node.appendChild(data);
+						node.classList.add("list-group-item");
+						node.classList.add("list-group-item-secondary");
+						document.getElementById('res').appendChild(node);
+					}
+				}
+				if(flag==false){
+					//if no toxicity found
+					var node=document.createElement("LI");
+					var data=document.createTextNode("Your Sentence contains no toxicity");
+					node.appendChild(data);
+					node.classList.add("list-group-item");
+					node.classList.add("list-group-item-secondary");
+					document.getElementById('res').appendChild(node);
+				}
+			});
+		});
+	}
+	</script>
+</head>
+<body>
+
+<div class="jumbotron text-center">
+  <h1>Toxicity Classifier (NLP)</h1>
+  <p>-by Vaibhav Haswani<br><br>
+  <a class="btn btn-light" href='https://github.com/VaibhavHaswani/Toxicity-classifier'>	<i class="fa fa-github"> Click for Source</i> </a>
+  </p> 
+</div>
+<div class="container text-center">
+	
+	<br>
+	<input type="text" id="txt" placeholder="Enter some text" class="form-control">
+	<br>
+	<button onclick=predict() class="btn btn-dark">Classify</button><br><br><br>
+	<div class="container text-center"><h4>Results:</h4><br>
+		<ul id="res">
+			
+		</ul>
+	</div>
+</div>
+</body>
+</html>
