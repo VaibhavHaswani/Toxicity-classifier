@@ -24,15 +24,22 @@
 		}
 
 
-
 		function predict(){
+
 		var text=document.getElementById("txt").value; //get the input data
 		clearNodes();    //clear all previous results
-		const threshold=0.9; //setting threshold for model
+
+		var load=document.createElement("LI"); //add load spinner
+		load.classList.add("spinner-border");
+		document.getElementById("res").appendChild(load);
+
+		const threshold=0.85; //setting threshold for model
 		toxicity.load(threshold).then(model=>{
 			const sentences=[text];
 			model.classify(sentences).then(predictions=>{
 				var flag=false;
+				var res=document.getElementById("res"); //remove load
+				res.removeChild(res.lastChild);
 				for(i=0;i<7;i++){
 					if(predictions[i].results[0].match){
 						flag=true;  //flag on if any toxicity found
@@ -58,6 +65,13 @@
 		});
 	}
 	</script>
+
+	<style>
+		.jumbotron {
+			background-size: cover;
+			height: 100%;
+		}
+	</style>
 </head>
 <body>
 
@@ -67,15 +81,15 @@
   <a class="btn btn-light" href='https://github.com/VaibhavHaswani/Toxicity-classifier'>	<i class="fa fa-github"> Click for Source</i> </a>
   </p> 
 </div>
-<div class="container text-center">
-	
+
+
+<div class="container text-center">	
 	<br>
 	<input type="text" id="txt" placeholder="Enter some text" class="form-control">
 	<br>
-	<button onclick=predict() class="btn btn-dark">Classify</button><br><br><br>
+	<button onclick="predict()" id="pred" class="btn btn-dark">Classify</button><br><br><br>
 	<div class="container text-center"><h4>Results:</h4><br>
 		<ul id="res">
-			
 		</ul>
 	</div>
 </div>
